@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>WaterToken Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Modern font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: #ffffff;
+      color: #111827;
+      padding: 32px 16px;
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Top bar */
+
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+    }
+
+    .pill-outline {
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill-outline.status-ok {
+      border-color: #bbf7d0;
+      background: #ecfdf5;
+      color: #166534;
+    }
+
+    .pill-outline.status-paused {
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .pill-dot.paused {
+      background: #f97316;
+    }
+
+    .wallet-pill {
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #111827;
+      color: white;
+      font-weight: 500;
+      font-size: 0.8rem;
+    }
+
+    /* Page header */
+
+    .page-header {
+      margin-bottom: 20px;
+    }
+
+    .page-header h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #0f172a;
+    }
+
+    .page-header p {
+      font-size: 0.95rem;
+      color: #6b7280;
+    }
+
+    /* Cards layout */
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 24px 26px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .card-header h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .card-icon-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: #eff6ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      color: #2563eb;
+    }
+
+    .card-icon-circle.green {
+      background: #ecfdf5;
+      color: #16a34a;
+    }
+
+    .muted {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .balance-value {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-top: 6px;
+      color: #111827;
+    }
+
+    .balance-unit {
+      font-size: 0.8rem;
+      margin-left: 4px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .status-tag {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: 500;
+    }
+
+    .status-tag.green {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-tag.yellow {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+
+    .status-tag.blue {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    /* Usage card */
+
+    .usage-content {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .donut-wrapper {
+      position: relative;
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      background: conic-gradient(#2563eb 0deg, #e5e7eb 0deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .donut-inner {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .donut-percent {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+
+    .donut-label {
+      font-size: 0.75rem;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .usage-details {
+      flex: 1;
+      font-size: 0.8rem;
+      color: #4b5563;
+    }
+
+    .usage-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+
+    .usage-label {
+      color: #6b7280;
+    }
+
+    .usage-value {
+      font-weight: 500;
+    }
+
+    /* Tabs + forms */
+
+    .tabs {
+      display: inline-flex;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      margin-bottom: 14px;
+    }
+
+    .tab {
+      padding: 7px 14px;
+      font-size: 0.85rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-weight: 500;
+      color: #6b7280;
+    }
+
+    .tab.active {
+      background: #ffffff;
+      color: #2563eb;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.1);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #4b5563;
+      font-weight: 500;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    input[type="number"] {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      color: #111827;
+      font-size: 0.9rem;
+      flex: 1;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background: #ffffff;
+      box-shadow: 0 0 0 1px #bfdbfe;
+    }
+
+    .input-suffix {
+      font-size: 0.8rem;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    button {
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: transform 0.05s ease, box-shadow 0.1s ease, background 0.1s ease;
+    }
+
+    button:active {
+      transform: translateY(1px);
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #111827;
+      border: 1px solid #d1d5db;
+    }
+
+    .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .warning-text {
+      font-size: 0.76rem;
+      color: #b45309;
+      margin-top: 2px;
+    }
+
+    /* Activity table */
+
+    .activity-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 0.8rem;
+    }
+
+    .activity-header-row {
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 0.7rem;
+      color: #9ca3af;
+    }
+
+    .activity-table th,
+    .activity-table td {
+      padding: 8px 0;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+    }
+
+    .activity-col-type {
+      width: 15%;
+    }
+
+    .activity-type-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 500;
+      font-size: 0.78rem;
+    }
+
+    .activity-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+    }
+
+    .dot-sell { background: #22c55e; }
+    .dot-buy { background: #2563eb; }
+    .dot-usage { background: #fb923c; }
+    .dot-allocation { background: #a855f7; }
+    .dot-unlock { background: #facc15; }
+
+    .activity-col-amount {
+      width: 18%;
+      text-align: right;
+      font-weight: 500;
+    }
+
+    .activity-col-date {
+      width: 22%;
+      text-align: right;
+      color: #6b7280;
+    }
+
+    .positive {
+      color: #16a34a;
+    }
+
+    .negative {
+      color: #dc2626;
+    }
+
+    /* Toast */
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      background: #16a34a;
+      color: #ecfdf5;
+      display: none;
+      box-shadow: 0 18px 40px rgba(22, 163, 74, 0.35);
+      z-index: 40;
+    }
+
+    .toast.error {
+      background: #dc2626;
+      color: #fef2f2;
+      box-shadow: 0 18px 40px rgba(220, 38, 38, 0.35);
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 20px 12px;
+      }
+
+      .topbar {
+        justify-content: space-between;
+      }
+
+      .wallet-pill {
+        font-size: 0.78rem;
+      }
+
+      .usage-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Top bar (status + wallet, no notification icon) -->
+    <div class="topbar">
+      <div class="topbar-right">
+        <div id="statusPill" class="pill-outline status-ok">
+          <span id="statusDot" class="pill-dot"></span>
+          <span id="statusText">Testnet · System Normal</span>
+        </div>
+        <div class="wallet-pill" id="walletAddress">0x0000...0000</div>
+      </div>
+    </div>
+
+    <!-- Page intro -->
+    <div class="page-header">
+      <h1>WaterToken Dashboard</h1>
+      <p>Manage your water allocation and tokens.</p>
+    </div>
+
+    <!-- Top stats -->
+    <div class="grid">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Total Balance</h2>
+            <div class="muted">All WaterTokens in your wallet</div>
+          </div>
+          <div class="card-icon-circle">💧</div>
+        </div>
+        <div class="balance-value">
+          <span id="totalBalance">0</span>
+          <span class="balance-unit">WTR</span>
+        </div>
+        <div class="status-tag blue">Locked + spendable</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Spendable (Unlocked)</h2>
+            <div class="muted">Tokens available to sell or consume immediately.</div>
+          </div>
+          <div class="card-icon-circle green">✓</div>
+        </div>
+        <div class="balance-value">
+          <span id="spendableBalance">0</span>
+          <span class="balance-unit">WTR</span>
+        </div>
+        <div class="status-tag green">Ready to use</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Locked Balance</h2>
+            <div class="muted">Monthly allocation. Pay outstanding bills to unlock.</div>
+          </div>
+          <div class="card-icon-circle">🔒</div>
+        </div>
+        <div class="balance-value">
+          <span id="lockedBalance">0</span>
+          <span class="balance-unit">WTR</span>
+        </div>
+        <div class="status-tag yellow">Expires at month end</div>
+      </div>
+    </div>
+
+    <!-- Middle row: usage + trade / tabs -->
+    <div class="grid">
+      <!-- Monthly usage -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Monthly Usage</h2>
+            <div class="muted">Allocation vs consumption</div>
+          </div>
+        </div>
+        <div class="usage-content">
+          <div class="donut-wrapper" id="donutWrapper">
+            <div class="donut-inner">
+              <div id="donutPercent" class="donut-percent">0%</div>
+              <div class="donut-label">USED</div>
+            </div>
+          </div>
+          <div class="usage-details">
+            <div class="usage-row">
+              <span class="usage-label">Consumed</span>
+              <span class="usage-value" id="usageConsumed">0 L</span>
+            </div>
+            <div class="usage-row">
+              <span class="usage-label">Limit</span>
+              <span class="usage-value" id="usageLimit">0 L</span>
+            </div>
+            <div class="usage-row">
+              <span class="usage-label">Remaining</span>
+              <span class="usage-value" id="usageRemaining">0 L</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trade / buy / sell -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Manage Tokens</h2>
+            <div class="muted">Buy extra allocation or sell surplus.</div>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button id="tabBuy" class="tab">Buy Extra</button>
+          <button id="tabSell" class="tab active">Sell Surplus</button>
+        </div>
+
+        <!-- Buy form (hidden by default) -->
+        <form id="buyForm" style="display:none;">
+          <label for="buyAmount">Amount (WaterTokens)</label>
+          <div class="input-row">
+            <input id="buyAmount" type="number" min="1" step="1" required />
+            <span class="input-suffix">WTR</span>
+          </div>
+          <div class="muted" id="buyEstimate"></div>
+          <div class="btn-row">
+            <button type="submit" class="btn-primary">Buy Tokens</button>
+          </div>
+        </form>
+
+        <!-- Sell form (default visible) -->
+        <form id="sellForm" style="display:flex; margin-top: 2px;">
+          <label for="sellAmount">Amount to Sell / Donate</label>
+          <div class="input-row">
+            <input id="sellAmount" type="number" min="1" step="1" required />
+            <span class="input-suffix">WTR</span>
+          </div>
+
+          <label for="sellPrice">Unit Price (USDT)</label>
+          <div class="input-row">
+            <input id="sellPrice" type="number" min="0" step="0.001" />
+            <span class="input-suffix">USDT</span>
+          </div>
+
+          <div class="warning-text" id="sellConstraint">
+            Max price: 1.25 × base allocation price.
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn-primary">Place Sell Order</button>
+            <button type="button" id="donateBtn" class="btn-secondary">Donate Tokens</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Recent activity -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2>Recent Activity</h2>
+          <div class="muted">Latest allocation, usage and trading actions.</div>
+        </div>
+      </div>
+
+      <table class="activity-table">
+        <thead>
+          <tr class="activity-header-row">
+            <th class="activity-col-type">Type</th>
+            <th>Details</th>
+            <th class="activity-col-amount">Amount</th>
+            <th class="activity-col-date">Date</th>
+          </tr>
+        </thead>
+        <tbody id="activityTableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // -------------------------
+    // Simple state
+    // -------------------------
+    const state = {
+      account: "0xAB12...34CD",
+      basePricePerLiter: 0.055,
+      maxPriceMultiplier: 1.25,
+      totalBalance: 1248,
+      spendableBalance: 248,
+      lockedBalance: 1000,
+      monthlyAllocation: 1248, // matches top total
+      consumedThisMonth: 450,
+      systemPaused: false,
+      activities: [
+        { type: "sell", title: "Sold at $0.06/unit", detail: "Sell order filled", amount: -2, unit: "WTR", date: "25 Nov, 20:59" },
+        { type: "allocation", title: "Monthly Base Allocation", detail: "Allocation from authority", amount: +1000, unit: "WTR", date: "20 Nov, 20:56" },
+        { type: "usage", title: "Smart Meter Reading", detail: "Water consumption recorded", amount: -50, unit: "WTR", date: "21 Nov, 20:56" },
+        { type: "unlock", title: "Payment processed", detail: "Locked tokens unlocked", amount: +100, unit: "WTR", date: "23 Nov, 20:56" },
+        { type: "buy", title: "Market Purchase", detail: "Bought extra tokens", amount: +200, unit: "WTR", date: "25 Nov, 19:56" }
+      ]
+    };
+
+    // -------------------------
+    // Helpers
+    // -------------------------
+    function $(id) { return document.getElementById(id); }
+    function formatLiters(v) { return v.toLocaleString() + " L"; }
+    function formatAmount(v) {
+      const sign = v > 0 ? "+" : "";
+      return sign + v.toLocaleString() + " WTR";
+    }
+    function formatPrice(v) { return v.toFixed(3); }
+
+    function showToast(message, isError = false) {
+      const toast = $("toast");
+      toast.textContent = message;
+      toast.classList.toggle("error", isError);
+      toast.style.display = "block";
+      setTimeout(() => { toast.style.display = "none"; }, 2500);
+    }
+
+    function addActivity(a) {
+      state.activities.unshift(a);
+      renderActivityTable();
+    }
+
+    // -------------------------
+    // Rendering
+    // -------------------------
+    function renderBalances() {
+      $("totalBalance").textContent = state.totalBalance.toLocaleString();
+      $("spendableBalance").textContent = state.spendableBalance.toLocaleString();
+      $("lockedBalance").textContent = state.lockedBalance.toLocaleString();
+      $("walletAddress").textContent = state.account;
+    }
+
+    function renderUsage() {
+      const { monthlyAllocation, consumedThisMonth } = state;
+      const remaining = Math.max(monthlyAllocation - consumedThisMonth, 0);
+      const usedPct = Math.round(
+        (consumedThisMonth / Math.max(monthlyAllocation, 1)) * 100
+      );
+
+      $("usageConsumed").textContent = formatLiters(consumedThisMonth);
+      $("usageLimit").textContent = formatLiters(monthlyAllocation);
+      $("usageRemaining").textContent = formatLiters(remaining);
+
+      $("donutPercent").textContent = usedPct + "%";
+
+      const deg = (usedPct / 100) * 360;
+      $("donutWrapper").style.background =
+        "conic-gradient(#2563eb 0deg " + deg + "deg, #e5e7eb " + deg + "deg 360deg)";
+    }
+
+    function renderStatus() {
+      const pill = $("statusPill");
+      const dot = $("statusDot");
+      const text = $("statusText");
+
+      if (state.systemPaused) {
+        pill.classList.remove("status-ok");
+        pill.classList.add("status-paused");
+        dot.classList.add("paused");
+        text.textContent = "Testnet · System Paused";
+      } else {
+        pill.classList.remove("status-paused");
+        pill.classList.add("status-ok");
+        dot.classList.remove("paused");
+        text.textContent = "Testnet · System Normal";
+      }
+    }
+
+    function renderBuyEstimate() {
+      const val = Number($("buyAmount").value);
+      const el = $("buyEstimate");
+
+      if (!val || val <= 0) {
+        el.textContent = "";
+        return;
+      }
+      const cost = val * state.basePricePerLiter;
+      el.textContent =
+        "Estimated cost: ~ " + formatPrice(cost) + " USDT";
+    }
+
+    function renderSellConstraint() {
+      const maxPrice = state.basePricePerLiter * state.maxPriceMultiplier;
+      $("sellConstraint").textContent =
+        "Max price allowed: " +
+        formatPrice(maxPrice) +
+        " USDT per token (1.25× base price).";
+    }
+
+    function renderActivityTable() {
+      const tbody = $("activityTableBody");
+      tbody.innerHTML = "";
+
+      if (state.activities.length === 0) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 4;
+        td.textContent = "No recent activity.";
+        td.className = "muted";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
+
+      state.activities.forEach((a) => {
+        const tr = document.createElement("tr");
+
+        // Type
+        const tdType = document.createElement("td");
+        tdType.className = "activity-col-type";
+        const typeWrap = document.createElement("div");
+        typeWrap.className = "activity-type-pill";
+
+        const dot = document.createElement("span");
+        dot.className = "activity-dot";
+        if (a.type === "sell") dot.classList.add("dot-sell");
+        if (a.type === "buy") dot.classList.add("dot-buy");
+        if (a.type === "usage") dot.classList.add("dot-usage");
+        if (a.type === "allocation") dot.classList.add("dot-allocation");
+        if (a.type === "unlock") dot.classList.add("dot-unlock");
+
+        const label = document.createElement("span");
+        label.textContent = a.type.charAt(0).toUpperCase() + a.type.slice(1);
+
+        typeWrap.appendChild(dot);
+        typeWrap.appendChild(label);
+        tdType.appendChild(typeWrap);
+
+        // Details
+        const tdDetails = document.createElement("td");
+        const main = document.createElement("div");
+        main.style.fontWeight = "500";
+        main.textContent = a.title;
+        const sub = document.createElement("div");
+        sub.className = "muted";
+        sub.textContent = a.detail;
+        tdDetails.appendChild(main);
+        tdDetails.appendChild(sub);
+
+        // Amount
+        const tdAmount = document.createElement("td");
+        tdAmount.className = "activity-col-amount";
+        tdAmount.textContent = formatAmount(a.amount);
+        tdAmount.classList.add(a.amount >= 0 ? "positive" : "negative");
+
+        // Date
+        const tdDate = document.createElement("td");
+        tdDate.className = "activity-col-date";
+        tdDate.textContent = a.date;
+
+        tr.appendChild(tdType);
+        tr.appendChild(tdDetails);
+        tr.appendChild(tdAmount);
+        tr.appendChild(tdDate);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderAll() {
+      renderBalances();
+      renderUsage();
+      renderStatus();
+      renderBuyEstimate();
+      renderSellConstraint();
+      renderActivityTable();
+    }
+
+    // -------------------------
+    // Events
+    // -------------------------
+    function setupEventHandlers() {
+      // Tabs
+      $("tabBuy").addEventListener("click", () => {
+        $("tabBuy").classList.add("active");
+        $("tabSell").classList.remove("active");
+        $("buyForm").style.display = "flex";
+        $("sellForm").style.display = "none";
+      });
+
+      $("tabSell").addEventListener("click", () => {
+        $("tabSell").classList.add("active");
+        $("tabBuy").classList.remove("active");
+        $("buyForm").style.display = "none";
+        $("sellForm").style.display = "flex";
+      });
+
+      // Inputs
+      $("buyAmount").addEventListener("input", renderBuyEstimate);
+
+      // Buy
+      $("buyForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const amount = Number($("buyAmount").value);
+        if (!amount || amount <= 0) {
+          showToast("Enter a valid amount.", true);
+          return;
+        }
+
+        state.totalBalance += amount;
+        state.spendableBalance += amount;
+        state.monthlyAllocation += amount;
+
+        addActivity({
+          type: "buy",
+          title: "Bought extra WaterTokens",
+          detail: "Simulated purchase",
+          amount,
+          unit: "WTR",
+          date: "Just now"
+        });
+
+        $("buyAmount").value = "";
+        renderAll();
+        showToast("Purchase simulated: +" + amount + " WTR");
+      });
+
+      // Sell
+      $("sellForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const amount = Number($("sellAmount").value);
+        const price = Number($("sellPrice").value);
+
+        if (!amount || amount <= 0) {
+          showToast("Enter a valid amount to sell.", true);
+          return;
+        }
+
+        if (amount > state.spendableBalance) {
+          showToast("You cannot sell more than your spendable balance.", true);
+          return;
+        }
+
+        if (price) {
+          const maxPrice = state.basePricePerLiter * state.maxPriceMultiplier;
+          if (price > maxPrice) {
+            showToast("Price exceeds the allowed maximum.", true);
+            return;
+          }
+        }
+
+        state.spendableBalance -= amount;
+        state.totalBalance -= amount;
+        state.monthlyAllocation = Math.max(state.monthlyAllocation - amount, 0);
+
+        addActivity({
+          type: "sell",
+          title: "Sold surplus tokens",
+          detail: price ? "Simulated sale @ " + formatPrice(price) + " USDT" : "Simulated sale",
+          amount: -amount,
+          unit: "WTR",
+          date: "Just now"
+        });
+
+        $("sellAmount").value = "";
+        $("sellPrice").value = "";
+        renderAll();
+        showToast("Sale simulated: -" + amount + " WTR");
+      });
+
+      // Donate
+      $("donateBtn").addEventListener("click", function () {
+        const amount = Number($("sellAmount").value);
+        if (!amount || amount <= 0) {
+          showToast("Enter an amount to donate.", true);
+          return;
+        }
+
+        if (amount > state.spendableBalance) {
+          showToast("You cannot donate more than your spendable balance.", true);
+          return;
+        }
+
+        state.spendableBalance -= amount;
+        state.totalBalance -= amount;
+        state.monthlyAllocation = Math.max(state.monthlyAllocation - amount, 0);
+
+        addActivity({
+          type: "sell",
+          title: "Donated WaterTokens",
+          detail: "Demo donation",
+          amount: -amount,
+          unit: "WTR",
+          date: "Just now"
+        });
+
+        $("sellAmount").value = "";
+        $("sellPrice").value = "";
+        renderAll();
+        showToast("Thank you! Donation simulated.");
+      });
+    }
+
+    // Init
+    document.addEventListener("DOMContentLoaded", function () {
+      setupEventHandlers();
+      renderAll();
+    });
+  </script>
+</body>
+</html>
